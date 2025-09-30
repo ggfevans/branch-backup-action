@@ -1,0 +1,139 @@
+name: Weekly Main Branch Backup
+
+on:
+  schedule:
+    # Run every Sunday at 00:00 UTC
+    # Adjust for your timezone: https://crontab.guru/
+    - cron: '0 0 * * 0'
+  workflow_dispatch: # Allow manual triggering
+
+env:
+  BACKUP_PREFIX: 'backup'
+  BRANCH_TO_BACKUP: 'main'
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write # For failure notifications
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch full history
+          ref: ${{ env.BRANCH_TO_BACKUP }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create backup branch
+        id: backup
+        run: |
+          set -e # Exit on any error
+          
+          BACKUP_DATE=$(date -u +"%Y-%m-%d")
+          BACKUP_BRANCH="${BACKUP_PREFIX}-${BACKUP_DATE}"
+          COMMIT_SHA=$(git rev-parse HEAD)
+          
+          echo "branch=${BACKUP_BRANCH}" >> $GITHUB_OUTPUT
+          echo "commit=${COMMIT_SHA}" >> $GITHUB_OUTPUT
+          echo "date=${BACKUP_DATE}" >> $GITHUB_OUTPUT
+
+          # Check if backup branch already exists
+          if git ls-remote --heads origin "${BACKUP_BRANCH}" | grep -q "${BACKUP_BRANCH}"; then
+            echo "status=skipped" >> $GITHUB_OUTPUT
+            echo "⏭️ Backup branch ${BACKUP_BRANCH} already exists"
+            exit 0
+          fi
+
+          # Create and push backup branch
+          git checkout -b "${BACKUP_BRANCH}"
+          git push origin "${BACKUP_BRANCH}"
+          
+          echo "status=created" >> $GITHUB_OUTPUT
+          echo "✅ Successfully created backup branch: ${BACKUP_BRANCH}"
+
+      - name: Create backup tag
+        if: steps.backup.outputs.status == 'created'
+        run: |
+          TAG_NAME="${{ steps.backup.outputs.branch }}"
+          
+          # Gather metadata
+          COMMITS_THIS_WEEK=$(git log --since='7 days ago' --oneline | wc -l)
+          CONTRIBUTORS=$(git log --since='7 days ago' --format='%an' | sort -u | wc -l)
+          FILES_CHANGED=$(git diff --name-only HEAD~${COMMITS_THIS_WEEK}..HEAD 2>/dev/null | wc -l || echo "0")
+          
+          # Create annotated tag
+          git tag -a "${TAG_NAME}" -m "Weekly Backup - ${{ steps.backup.outputs.date }}
+          
+          Repository: ${{ github.repository }}
+          Source Branch: ${{ env.BRANCH_TO_BACKUP }}
+          Commit: ${{ steps.backup.outputs.commit }}
+          Workflow Run: ${{ github.run_id }}
+          
+          Statistics (last 7 days):
+          - Commits: ${COMMITS_THIS_WEEK}
+          - Contributors: ${CONTRIBUTORS}
+          - Files Changed: ${FILES_CHANGED}
+          "
+          
+          git push origin "refs/tags/${TAG_NAME}"
+          echo "✅ Created backup tag with metadata"
+
+      - name: Create backup summary
+        if: always()
+        run: |
+          STATUS="${{ steps.backup.outputs.status }}"
+          BACKUP_BRANCH="${{ steps.backup.outputs.branch }}"
+          COMMIT_SHA="${{ steps.backup.outputs.commit }}"
+          
+          echo "## Weekly Backup Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "$STATUS" == "created" ]; then
+            echo "### ✅ Backup Created Successfully" >> $GITHUB_STEP_SUMMARY
+          elif [ "$STATUS" == "skipped" ]; then
+            echo "### ⏭️ Backup Already Exists" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Backup Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Details:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Date: \`${{ steps.backup.outputs.date }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: \`${BACKUP_BRANCH}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: \`${COMMIT_SHA}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Source: \`${{ env.BRANCH_TO_BACKUP }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "[View Backup Branch](https://github.com/${{ github.repository }}/tree/${BACKUP_BRANCH})" >> $GITHUB_STEP_SUMMARY
+
+      - name: Create failure issue
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const date = new Date().toISOString().split('T')[0];
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `⚠️ Weekly Backup Failed - ${date}`,
+              body: `The weekly backup workflow failed on ${date}.
+              
+              **Run Details:**
+              - Workflow: ${context.workflow}
+              - Run ID: ${context.runId}
+              - Run URL: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}
+              - Branch: \`${{ env.BRANCH_TO_BACKUP }}\`
+              
+              **Action Required:**
+              Please investigate the failure and ensure backups are working properly.
+              
+              ---
+              *This issue was automatically created by the backup workflow.*`,
+              labels: ['automation', 'backup-failure', 'priority-high']
+            });

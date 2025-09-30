@@ -1,0 +1,136 @@
+name: 'Weekly Branch Backup'
+description: 'Create weekly snapshot branches with rich metadata tracking for Git repositories'
+author: 'gevans'
+
+branding:
+  icon: 'archive'
+  color: 'blue'
+
+inputs:
+  backup-prefix:
+    description: 'Prefix for backup branch names'
+    required: false
+    default: 'backup'
+
+  branch-to-backup:
+    description: 'Branch to create backups from'
+    required: false
+    default: 'main'
+
+  github-token:
+    description: 'GitHub token for repository access'
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  backup-branch:
+    description: 'Name of the created backup branch'
+    value: ${{ steps.backup.outputs.branch }}
+
+  backup-status:
+    description: 'Status of backup operation (created, skipped, failed)'
+    value: ${{ steps.backup.outputs.status }}
+
+  commit-sha:
+    description: 'SHA of the commit that was backed up'
+    value: ${{ steps.backup.outputs.commit }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        ref: ${{ inputs.branch-to-backup }}
+        token: ${{ inputs.github-token }}
+
+    - name: Configure Git
+      shell: bash
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Create backup branch
+      id: backup
+      shell: bash
+      run: |
+        set -e
+
+        BACKUP_DATE=$(date -u +"%Y-%m-%d")
+        BACKUP_BRANCH="${{ inputs.backup-prefix }}-${BACKUP_DATE}"
+        COMMIT_SHA=$(git rev-parse HEAD)
+
+        echo "branch=${BACKUP_BRANCH}" >> $GITHUB_OUTPUT
+        echo "commit=${COMMIT_SHA}" >> $GITHUB_OUTPUT
+        echo "date=${BACKUP_DATE}" >> $GITHUB_OUTPUT
+
+        # Check if backup branch already exists
+        if git ls-remote --heads origin "${BACKUP_BRANCH}" | grep -q "${BACKUP_BRANCH}"; then
+          echo "status=skipped" >> $GITHUB_OUTPUT
+          echo "⏭️ Backup branch ${BACKUP_BRANCH} already exists"
+          exit 0
+        fi
+
+        # Create and push backup branch
+        git checkout -b "${BACKUP_BRANCH}"
+        git push origin "${BACKUP_BRANCH}"
+
+        echo "status=created" >> $GITHUB_OUTPUT
+        echo "✅ Successfully created backup branch: ${BACKUP_BRANCH}"
+
+    - name: Create backup tag
+      if: steps.backup.outputs.status == 'created'
+      shell: bash
+      run: |
+        TAG_NAME="${{ steps.backup.outputs.branch }}"
+
+        # Gather metadata
+        COMMITS_THIS_WEEK=$(git log --since='7 days ago' --oneline | wc -l)
+        CONTRIBUTORS=$(git log --since='7 days ago' --format='%an' | sort -u | wc -l)
+        FILES_CHANGED=$(git diff --name-only HEAD~${COMMITS_THIS_WEEK}..HEAD 2>/dev/null | wc -l || echo "0")
+
+        # Create annotated tag
+        git tag -a "${TAG_NAME}" -m "Weekly Backup - ${{ steps.backup.outputs.date }}
+
+        Repository: ${{ github.repository }}
+        Source Branch: ${{ inputs.branch-to-backup }}
+        Commit: ${{ steps.backup.outputs.commit }}
+        Workflow Run: ${{ github.run_id }}
+
+        Statistics (last 7 days):
+        - Commits: ${COMMITS_THIS_WEEK}
+        - Contributors: ${CONTRIBUTORS}
+        - Files Changed: ${FILES_CHANGED}
+        "
+
+        git push origin "refs/tags/${TAG_NAME}"
+        echo "✅ Created backup tag with metadata"
+
+    - name: Create backup summary
+      if: always()
+      shell: bash
+      run: |
+        STATUS="${{ steps.backup.outputs.status }}"
+        BACKUP_BRANCH="${{ steps.backup.outputs.branch }}"
+        COMMIT_SHA="${{ steps.backup.outputs.commit }}"
+
+        echo "## Weekly Backup Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        if [ "$STATUS" == "created" ]; then
+          echo "### ✅ Backup Created Successfully" >> $GITHUB_STEP_SUMMARY
+        elif [ "$STATUS" == "skipped" ]; then
+          echo "### ⏭️ Backup Already Exists" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "### ❌ Backup Failed" >> $GITHUB_STEP_SUMMARY
+        fi
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Details:**" >> $GITHUB_STEP_SUMMARY
+        echo "- Date: \`${{ steps.backup.outputs.date }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "- Branch: \`${BACKUP_BRANCH}\`" >> $GITHUB_STEP_SUMMARY
+        echo "- Commit: \`${COMMIT_SHA}\`" >> $GITHUB_STEP_SUMMARY
+        echo "- Source: \`${{ inputs.branch-to-backup }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "[View Backup Branch](https://github.com/${{ github.repository }}/tree/${BACKUP_BRANCH})" >> $GITHUB_STEP_SUMMARY
