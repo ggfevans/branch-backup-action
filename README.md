@@ -2,7 +2,7 @@
 
 Automatically create weekly snapshot branches with rich metadata and failure notifications.
 
-[![GitHub](https://img.shields.io/github/license/ggfevans/github-weekly-backup-action)](LICENSE)
+[![GitHub](https://img.shields.io/github/license/ggfevans/github-weekly-backup-action)]([LICENSE](https://github.com/ggfevans/github-weekly-backup-action/blob/main/LICENSE))
 [![GitHub issues](https://img.shields.io/github/issues/ggfevans/github-weekly-backup-action)](https://github.com/ggfevans/github-weekly-backup-action/issues)
 
 ## Origin & Disclaimer
