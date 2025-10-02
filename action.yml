@@ -58,7 +58,9 @@ runs:
         set -e
 
         BACKUP_DATE=$(date -u +"%Y-%m-%d")
-        BACKUP_BRANCH="${{ inputs.backup-prefix }}-${BACKUP_DATE}"
+        # Sanitize branch name for use in backup branch name (replace / with -)
+        SOURCE_BRANCH_CLEAN=$(echo "${{ inputs.branch-to-backup }}" | sed 's/\//-/g')
+        BACKUP_BRANCH="${SOURCE_BRANCH_CLEAN}-${{ inputs.backup-prefix }}-${BACKUP_DATE}"
         COMMIT_SHA=$(git rev-parse HEAD)
 
         echo "branch=${BACKUP_BRANCH}" >> $GITHUB_OUTPUT

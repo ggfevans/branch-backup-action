@@ -58,7 +58,7 @@ Comprehensive troubleshooting guide for the Weekly GitHub Branch Backup action.
        token: ${{ secrets.ADMIN_TOKEN }}
    
    # Option 2: Exclude backup branches from protection
-   # Go to Settings → Branches → Edit rule → Exclude backup-*
+   # Go to Settings → Branches → Edit rule → Exclude *-backup-*
    ```
 
 3. **Organization policies**:
@@ -74,7 +74,7 @@ Comprehensive troubleshooting guide for the Weekly GitHub Branch Backup action.
 #### Branch Already Exists
 **Behavior**: Workflow skips with "Backup branch already exists"
 **Expected**: This is normal behavior - prevents duplicate backups
-**Check**: Look for branch named `backup-YYYY-MM-DD` in repository
+**Check**: Look for branch named `{branch}-backup-YYYY-MM-DD` in repository
 
 #### Git Configuration Errors
 **Error**: `Author identity unknown` or similar Git errors
@@ -89,12 +89,12 @@ Comprehensive troubleshooting guide for the Weekly GitHub Branch Backup action.
 ```
 
 #### Tag Creation Fails
-**Error**: `fatal: tag 'backup-YYYY-MM-DD' already exists`
+**Error**: `fatal: tag '{branch}-backup-YYYY-MM-DD' already exists`
 **Cause**: Tag exists but branch doesn't (unusual state)
 **Manual fix**:
 ```bash
 # Delete the orphaned tag
-git push origin --delete refs/tags/backup-2024-01-01
+git push origin --delete refs/tags/main-backup-2024-01-01
 ```
 
 ### Repository Size Issues
