@@ -1,0 +1,18 @@
+version: 2
+updates:
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "gevans"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    open-pull-requests-limit: 5
