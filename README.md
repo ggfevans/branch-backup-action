@@ -30,6 +30,27 @@ jobs:
 
 Creates branches named `backup-YYYY-MM-DD` with annotated tags. Manual trigger available in Actions tab.
 
+## Setup Requirements
+
+### Personal Access Token
+
+This workflow requires a [fine-grained personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token) with the following permissions:
+
+**Required permissions:**
+- **Repository access:** The repository you want to backup
+- **Contents:** Read and Write
+- **Pull requests:** Read and Write  
+- **Actions:** Read and Write
+
+**Setup steps:**
+1. Go to [GitHub Settings > Developer settings > Personal access tokens > Fine-grained tokens](https://github.com/settings/personal-access-tokens/new)
+2. Create a new fine-grained token
+3. Select your repository under "Repository access"
+4. Grant the required permissions listed above
+5. Add the token to your repository secrets as `GITHUB_TOKEN` or use it in your workflow
+
+> **Note:** Fine-grained tokens are more secure than classic tokens as they provide repository-specific access with minimal required permissions.
+
 ## For Obsidian Users
 
 Protects against accidental deletions, sync conflicts, and failed plugin updates:
