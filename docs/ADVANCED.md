@@ -114,7 +114,7 @@ If your main branch has protection rules:
 
 2. **Option 2**: Use a service account with admin permissions
    ```yaml
-   - uses: actions/checkout@v4
+   - uses: actions/checkout@v5
      with:
        token: ${{ secrets.ADMIN_TOKEN }}
    ```
