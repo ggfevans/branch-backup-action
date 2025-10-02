@@ -97,8 +97,8 @@ jobs:
 ```yaml
 - name: Restore from specific backup
   run: |
-    git fetch origin backup-2024-01-01
-    git checkout backup-2024-01-01
+    git fetch origin main-backup-2024-01-01
+    git checkout main-backup-2024-01-01
     # Copy files you need, then return to main
     git checkout main
 ```
@@ -110,7 +110,7 @@ If your main branch has protection rules:
 1. **Option 1**: Exclude backup branches from protection
    - Go to Settings → Branches
    - Edit branch protection rule
-   - Add `backup-*` to branch name pattern exclusions
+   - Add `*-backup-*` to branch name pattern exclusions
 
 2. **Option 2**: Use a service account with admin permissions
    ```yaml

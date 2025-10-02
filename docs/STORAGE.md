@@ -13,14 +13,14 @@
 
 **Delete single backup:**
 ```bash
-git push origin --delete backup-2024-01-01
-git push origin --delete refs/tags/backup-2024-01-01
+git push origin --delete main-backup-2024-01-01
+git push origin --delete refs/tags/main-backup-2024-01-01
 ```
 
 **Delete backups older than 90 days:**
 ```bash
 git fetch --all
-git branch -r | grep 'origin/backup-' | while read branch; do
+git branch -r | grep 'origin/.*-backup-' | while read branch; do
   BRANCH_DATE=$(echo $branch | grep -oP '\d{4}-\d{2}-\d{2}')
   DAYS_OLD=$(( ($(date +%s) - $(date -d "$BRANCH_DATE" +%s)) / 86400 ))
   
@@ -35,7 +35,7 @@ done
 **Keep only last 12 backups:**
 ```bash
 git fetch --all
-git branch -r | grep 'origin/backup-' | sort -r | tail -n +13 | while read branch; do
+git branch -r | grep 'origin/.*-backup-' | sort -r | tail -n +13 | while read branch; do
   git push origin --delete ${branch#origin/}
   git push origin --delete refs/tags/${branch#origin/}
 done
@@ -43,7 +43,7 @@ done
 
 **PowerShell (Windows):**
 ```powershell
-$backups = git branch -r | Select-String 'origin/backup-'
+$backups = git branch -r | Select-String 'origin/.*-backup-'
 foreach ($branch in $backups) {
     if ($branch -match '\d{4}-\d{2}-\d{2}') {
         $backupDate = [DateTime]::ParseExact($matches[0], "yyyy-MM-dd", $null)
@@ -98,7 +98,7 @@ jobs:
 **Check repository size:**
 ```bash
 du -sh .git  # Shows .git folder size
-git branch -r | grep backup- | wc -l  # Count backup branches
+git branch -r | grep '.*-backup-' | wc -l  # Count backup branches
 ```
 
 **Add to backup workflow:**
@@ -125,7 +125,7 @@ git branch -r | grep backup- | wc -l  # Count backup branches
 **Emergency cleanup:**
 ```bash
 # Delete oldest 10 backups
-git branch -r | grep 'origin/backup-' | head -10 | while read branch; do
+git branch -r | grep 'origin/.*-backup-' | head -10 | while read branch; do
   git push origin --delete ${branch#origin/}
   git push origin --delete refs/tags/${branch#origin/}
 done
@@ -133,6 +133,6 @@ done
 
 **Check cleanup results:**
 ```bash
-git branch -r | grep backup- | wc -l  # Count remaining
+git branch -r | grep '.*-backup-' | wc -l  # Count remaining
 du -sh .git  # Check size
 ```
