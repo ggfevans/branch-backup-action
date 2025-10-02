@@ -6,7 +6,7 @@ This document contains all the settings and metadata for configuring the GitHub 
 
 ### Basic Information
 
-**Repository name:** `github-weekly-backup-action`
+**Repository name:** `branch-backup-action`
 
 **Description (short):**
 ```
@@ -58,14 +58,14 @@ Go to Settings → Actions → General:
 The README already includes these badges (update usernames):
 
 ```markdown
-[![GitHub](https://img.shields.io/github/license/ggfevans/github-weekly-backup-action)](LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/ggfevans/github-weekly-backup-action)](https://github.com/ggfevans/github-weekly-backup-action/issues)
+[![GitHub](https://img.shields.io/github/license/ggfevans/branch-backup-action)](LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/ggfevans/branch-backup-action)](https://github.com/ggfevans/branch-backup-action/issues)
 ```
 
 **Additional optional badges:**
 ```markdown
-[![GitHub stars](https://img.shields.io/github/stars/ggfevans/github-weekly-backup-action)](https://github.com/ggfevans/github-weekly-backup-action/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ggfevans/github-weekly-backup-action)](https://github.com/ggfevans/github-weekly-backup-action/network)
+[![GitHub stars](https://img.shields.io/github/stars/ggfevans/branch-backup-action)](https://github.com/ggfevans/branch-backup-action/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ggfevans/branch-backup-action)](https://github.com/ggfevans/branch-backup-action/network)
 ```
 
 ## Initial Release
@@ -146,7 +146,7 @@ now sharing with the community.
 
 Includes metadata tags & failure notifications. Provided as-is 🚀
 
-https://github.com/ggfevans/github-weekly-backup-action
+https://github.com/ggfevans/branch-backup-action
 
 #GitHubActions #Obsidian #Git
 ```

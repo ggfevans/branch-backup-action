@@ -71,7 +71,7 @@ You could simplify to branches-only by removing the "Create backup tag" step fro
 ## Next Steps
 
 ```bash
-cd D:\gevans\code\github\personal\github-weekly-backup-action
+cd D:\gevans\code\github\personal\branch-backup-action
 
 # Commit the fixes
 git add .
