@@ -3,7 +3,7 @@ description: 'Create weekly snapshot branches with rich metadata tracking for Gi
 author: 'gevans'
 
 branding:
-  icon: 'archive'
+  icon: 'git-branch'
   color: 'blue'
 
 inputs:

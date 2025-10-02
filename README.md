@@ -1,241 +1,164 @@
 # Weekly GitHub Branch Backup
 
-Automatically create weekly snapshot branches with rich metadata and failure notifications.
-
 [![GitHub](https://img.shields.io/github/license/ggfevans/github-weekly-backup-action)]([LICENSE](https://github.com/ggfevans/github-weekly-backup-action/blob/main/LICENSE))
+[![GitHub release](https://img.shields.io/github/v/release/ggfevans/github-weekly-backup-action)](https://github.com/ggfevans/github-weekly-backup-action/releases)
 [![GitHub issues](https://img.shields.io/github/issues/ggfevans/github-weekly-backup-action)](https://github.com/ggfevans/github-weekly-backup-action/issues)
 
-## Origin & Disclaimer
+Automatically create weekly snapshot branches with rich metadata and failure notifications.
 
-**Original use case:** I created this workflow for my personal Obsidian vault that syncs via Git. I wanted weekly snapshots as insurance against accidental changes or sync conflicts.
+**Originally created for Obsidian vaults synced via Git, but works with any repository where you want periodic branch snapshots.**
 
-**Provided as-is:** This workflow works well for my needs, but I'm sharing it without any warranty or ongoing support commitment. It may or may not fit your use case. Feel free to fork and modify as needed.
+> **Provided as-is:** This workflow works well for my needs, but I'm sharing it without warranty or guaranteed support. Feel free to fork and modify as needed.
 
-**Note:** While I originally built this for Obsidian, it works with any Git repository where you want periodic branch snapshots.
+## ✨ Features
 
-## Features
+- 📅 **Automatic weekly backups** every Sunday at midnight UTC
+- 🏷️ **Annotated Git tags** with commit statistics (commits, contributors, files changed)
+- 🚨 **Automatic issue creation** on workflow failures
+- 📊 **Detailed workflow summaries** in Actions tab
+- ♾️ **Indefinite retention** (no automatic cleanup)
+- 🔧 **Manual trigger** support via workflow dispatch
+- ⚙️ **Configurable** via environment variables
 
-- Automatic weekly backups every Sunday at midnight UTC
-- Annotated Git tags with commit statistics (commits, contributors, files changed)
-- Automatic issue creation on workflow failures
-- Detailed workflow run summaries
-- Indefinite backup retention (no automatic cleanup)
-- Manual trigger support via workflow dispatch
-- Configurable via environment variables
+## 🚀 Quick Start
 
-## Quick Start
+### Option 1: GitHub Action (Recommended)
 
-### Option 1: Use This Template (Recommended)
-
-Click the **"Use this template"** button above to create a repository with the workflow pre-configured.
-
-### Option 2: Manual Installation
-
-1. Create `.github/workflows/` directory in your repository
-2. Copy `weekly-backup.yml` to `.github/workflows/`
-3. Commit and push
-
-The workflow will run automatically every Sunday at 00:00 UTC.
-
-## Using with Obsidian Vaults
-
-This workflow was specifically designed for Obsidian vaults synced via Git:
-
-**Why weekly backups for Obsidian?**
-- Protection against accidental bulk deletions or edits
-- Recovery point before major vault reorganizations
-- Insurance against sync conflicts across devices
-- Snapshot of vault state before plugin updates or changes
-
-**Setup for Obsidian users:**
-1. Ensure your Obsidian vault is already syncing to GitHub
-2. Add this workflow to your vault's repository
-3. Weekly snapshots run automatically
-
-**Recovery from backup:**
-```bash
-# If you need to recover from a specific date
-git checkout backup-2025-09-29
-# Review your vault, copy files you need, then return to main
-git checkout main
-```
-
-**Note:** The `.obsidian/` folder (with settings and plugin data) is included in backups if it's tracked in your repository.
-
-## Default Behavior
-
-**What it does:**
-- Backs up the `main` branch
-- Creates branches named `backup-YYYY-MM-DD`
-- Creates annotated tags with the same name
-- Skips if a backup for that date already exists
-- Creates a GitHub issue if the workflow fails
-
-**What gets backed up:**
-- Complete commit history
-- All files and directories
-- Branch state at time of backup
-
-## Configuration
-
-### Change Backup Schedule
-
-Edit the cron expression in the workflow file:
+Add this workflow file to your repository:
 
 ```yaml
+# .github/workflows/backup.yml
+name: Weekly Backup
 on:
   schedule:
     - cron: '0 0 * * 0'  # Every Sunday at midnight UTC
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - uses: ggfevans/github-weekly-backup-action@v0.1
+        with:
+          backup-prefix: 'backup'        # Optional: customize branch prefix
+          branch-to-backup: 'main'       # Optional: change source branch
 ```
 
-Common alternatives:
-- `'0 0 * * 1'` - Every Monday
-- `'0 0 1 * *'` - First day of every month
-- `'0 0 * * 0,3'` - Every Sunday and Wednesday
+### Option 2: Use This Template
 
-Use [crontab.guru](https://crontab.guru/) to create custom schedules.
+Click **"Use this template"** to create a repository with the workflow pre-configured.
 
-### Customize Branch Names or Source
+The workflow runs automatically every Sunday at 00:00 UTC and can be triggered manually from the Actions tab.
 
-Edit environment variables in the workflow:
+## 📝 Obsidian Users
 
+This action was specifically designed for Obsidian vaults synced via Git:
+
+**Why weekly backups?**
+- Protection against accidental bulk deletions or edits
+- Recovery point before major vault reorganizations  
+- Insurance against sync conflicts across devices
+- Snapshot of vault state before plugin updates
+
+**Quick setup:**
+1. Ensure your vault is syncing to GitHub
+2. Add the workflow above to your vault's repository
+3. Weekly snapshots run automatically
+
+**Recovery:**
+```bash
+git checkout backup-2025-09-29  # Review your vault
+git checkout main               # Return to current state
+```
+
+## ⚙️ Configuration
+
+**Default behavior:**
+- Backs up the `main` branch
+- Creates branches named `backup-YYYY-MM-DD`
+- Creates annotated tags with metadata
+- Skips if backup already exists for that date
+- Creates GitHub issue on workflow failures
+
+**Customize the action:**
 ```yaml
-env:
-  BACKUP_PREFIX: 'backup'        # Change to 'snapshot', 'archive', etc.
-  BRANCH_TO_BACKUP: 'main'       # Change to 'develop', 'production', etc.
+- uses: ggfevans/github-weekly-backup-action@v0.1
+  with:
+    backup-prefix: 'snapshot'     # Custom prefix
+    branch-to-backup: 'develop'   # Different source branch
 ```
 
-### Manual Trigger
+**Change schedule:**
+```yaml
+on:
+  schedule:
+    - cron: '0 0 * * 1'  # Every Monday instead of Sunday
+```
+Use [crontab.guru](https://crontab.guru/) for custom schedules.
 
-Navigate to **Actions → Weekly Main Branch Backup → Run workflow** to create a backup on demand.
+**Manual trigger:** Go to Actions → Your Backup Workflow → Run workflow
 
-## Monitoring
+## 📊 Monitoring
 
-### Backup Branches and Tags
+**View backups:** All backups appear as branches (`backup-YYYY-MM-DD`) and tags with metadata
 
-All backups are visible in your repository:
-- **Branches:** `backup-YYYY-MM-DD`
-- **Tags:** Same as branch names, with annotated metadata
+**Workflow summaries:** Each run shows status, date, and links in the Actions tab
 
-### Workflow Summaries
+**Failure notifications:** Failed workflows automatically create GitHub issues with details
 
-Each run creates a summary visible in the Actions tab showing:
-- Backup status (created/skipped/failed)
-- Date, branch name, and commit SHA
-- Link to the backup branch
-
-### Failure Notifications
-
-If the workflow fails, it automatically creates a GitHub issue with:
-- Failure date
-- Link to failed workflow run
-- Labels: `automation`, `backup-failure`, `priority-high`
-
-## Storage Considerations
+## 💾 Storage
 
 **Important:** This workflow preserves all backups indefinitely.
 
-Monitor repository size at `Settings → Storage`. GitHub provides 1GB free storage for repositories.
+Monitor repository size at `Settings → Storage`. GitHub provides 1GB free storage.
 
-### Manual Cleanup
-
-To remove old backups:
-
+**Manual cleanup:**
 ```bash
-# Delete a specific backup branch
+# Delete old backup
 git push origin --delete backup-2025-01-01
-
-# Delete the corresponding tag
 git push origin --delete refs/tags/backup-2025-01-01
 ```
 
-For bulk deletion, see [docs/manual-cleanup.md](docs/manual-cleanup.md).
+See [Storage Management](docs/STORAGE.md) for bulk cleanup scripts.
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
-### Workflow Not Running
+**Workflow not running?**
+- Enable Actions: `Settings → Actions → General`
+- Verify cron expression at [crontab.guru](https://crontab.guru/)
+- Note: GitHub Actions may have 15+ minute delays
 
-**Check Actions are enabled:**
-1. Go to `Settings → Actions → General`
-2. Ensure "Allow all actions and reusable workflows" is selected
+**Permission errors?**
+- Ensure workflow has `contents: write` and `issues: write` permissions
+- Check branch protection rules don't block backup branches
 
-**Verify the schedule:**
-- Check the cron expression is valid
-- Note: GitHub Actions may have up to 15-minute delays during high load
+See [Troubleshooting Guide](docs/TROUBLESHOOTING.md) for detailed help.
 
-### Permission Errors
+## 📚 Documentation
 
-The workflow uses the default `GITHUB_TOKEN` which has sufficient permissions for creating branches and tags. No additional configuration is needed.
+- **[Setup Guide](docs/SETUP_GUIDE.md)** - Quick setup instructions
+- **[Advanced Configuration](docs/ADVANCED.md)** - Multiple branches, custom schedules, integrations
+- **[Storage Management](docs/STORAGE.md)** - Cleanup scripts and retention strategies  
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Comprehensive problem-solving guide
+- **[Manual Cleanup](docs/manual-cleanup.md)** - Scripts for bulk backup deletion
 
-**Branch protection:** If your main branch has protection rules, ensure the workflow token has appropriate permissions or exclude backup branches from protection.
+## 🤝 Contributing
 
-### Workflow Fails Silently
+This is a personal project shared as-is. While I'm happy to review pull requests:
 
-Check the Actions tab for workflow runs. Failed runs will have a red indicator and create an issue automatically.
+- **Response times vary** - This is a side project  
+- **Forks encouraged** - Feel free to create your own version
+- **Limited feature scope** - The workflow meets my current needs
 
-## Advanced Usage
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-### Backup Multiple Branches
+## 📄 License
 
-Create additional workflow files for different branches:
-
-```yaml
-# .github/workflows/backup-develop.yml
-env:
-  BACKUP_PREFIX: 'dev-backup'
-  BRANCH_TO_BACKUP: 'develop'
-```
-
-### Custom Metadata
-
-Edit the tag creation step to include additional information relevant to your workflow.
-
-### Integration with Other Workflows
-
-Backup branches can be referenced in other workflows:
-
-```yaml
-- name: Restore from backup
-  run: |
-    git fetch origin backup-2025-01-01
-    git checkout backup-2025-01-01
-```
-
-## Documentation
-
-- [Setup Guide](docs/SETUP_GUIDE.md) - Quick setup instructions
-- [Manual Cleanup](docs/manual-cleanup.md) - Scripts for bulk backup deletion
-- [GitHub Configuration](docs/GITHUB_CONFIG.md) - Repository setup reference
-
-## Contributing
-
-This is a personal project I'm sharing with the community. While I'm happy to review pull requests and consider improvements, please understand:
-
-- **Response times may vary** - This is a side project
-- **I may not implement all feature requests** - The workflow meets my needs as-is
-- **Forks are encouraged** - Feel free to create your own version with different features
-
-If you do want to contribute:
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request with a clear description of the changes
-
-For bugs or feature ideas, open an issue. I'll respond when I can.
-
-## License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## Support
-
-**Limited support available.** Since this is a personal tool I'm sharing as-is:
-
-- **Issues:** You can [report bugs or request features](https://github.com/ggfevans/github-weekly-backup-action/issues), but responses may be slow or not guaranteed
-- **Community support:** Other users may be able to help in the Discussions tab
-- **Forks welcome:** If you need different behavior, feel free to fork and customize
-
-**For Obsidian users:** This workflow was designed for Obsidian vaults synced via Git. It creates snapshots before potential sync conflicts or unwanted changes.
+MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**A personal tool shared with the community.** Originally built for backing up my Obsidian vault, now available for anyone who finds it useful. No warranty, no guaranteed support, but hopefully helpful!
+**A personal tool shared with the community.** Originally built for my Obsidian vault, now available for anyone who finds it useful. No warranty or guaranteed support, but hopefully helpful!
