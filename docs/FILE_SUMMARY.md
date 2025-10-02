@@ -1,11 +1,11 @@
 # Repository File Summary
 
-All files have been created in your local repository: `D:\gevans\code\github\personal\github-weekly-backup-action`
+All files have been created in your local repository: `D:\gevans\code\github\personal\branch-backup-action`
 
 ## File Structure Created
 
 ```
-github-weekly-backup-action/
+branch-backup-action/
 ├── .github/
 │   ├── ISSUE_TEMPLATE/
 │   │   ├── bug_report.md                    # Bug report template
@@ -52,13 +52,13 @@ github-weekly-backup-action/
 ## Next Steps
 
 ### 1. Review the Files
-All URLs have been updated to use `ggfevans/github-weekly-backup-action`.
+All URLs have been updated to use `ggfevans/branch-backup-action`.
 Documentation files are now organized in the `docs/` directory.
 
 ### 2. Commit and Push
 
 ```bash
-cd D:\gevans\code\github\personal\github-weekly-backup-action
+cd D:\gevans\code\github\personal\branch-backup-action
 git add .
 git commit -m "Initial commit: Add weekly backup workflow and documentation"
 git push origin main
@@ -105,7 +105,7 @@ Use templates in `docs/GITHUB_CONFIG.md` for:
 
 ```bash
 # Navigate to repository
-cd D:\gevans\code\github\personal\github-weekly-backup-action
+cd D:\gevans\code\github\personal\branch-backup-action
 
 # Check status
 git status
@@ -156,7 +156,7 @@ dir  # or 'ls' if using Git Bash
 - [x] Documentation complete
 - [x] Templates configured
 - [x] Configuration guide provided
-- [x] URLs updated to ggfevans/github-weekly-backup-action
+- [x] URLs updated to ggfevans/branch-backup-action
 - [x] Documentation organized in docs/ directory
 - [ ] Files reviewed by you
 - [ ] Committed and pushed
@@ -168,7 +168,7 @@ dir  # or 'ls' if using Git Bash
 
 Your repository is at:
 ```
-https://github.com/ggfevans/github-weekly-backup-action
+https://github.com/ggfevans/branch-backup-action
 ```
 
 ---

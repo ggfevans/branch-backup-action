@@ -2,7 +2,7 @@
 
 Thanks for your interest in contributing to the Weekly GitHub Branch Backup action!
 
-## 🚨 Important Notice
+## Important Notice
 
 This is a **personal project** I'm sharing as-is with the community. While I appreciate contributions, please understand:
 
@@ -10,7 +10,7 @@ This is a **personal project** I'm sharing as-is with the community. While I app
 - **Selective implementation** - I may not implement all feature requests as the current functionality meets my needs
 - **Forks encouraged** - Feel free to fork and create your own version with different features
 
-## 🤝 How to Contribute
+## How to Contribute
 
 ### Reporting Issues
 
@@ -49,21 +49,21 @@ If you'd like to submit code changes:
 3. **Test evidence** - Show that your changes work as expected
 4. **Be patient** - Response times may vary significantly
 
-## 🛠️ Development Setup
+## Development Setup
 
 This is a composite GitHub Action, so development is straightforward:
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/github-weekly-backup-action
-cd github-weekly-backup-action
+git clone https://github.com/YOUR_USERNAME/branch-backup-action
+cd branch-backup-action
 
 # Make changes to action.yml or documentation
 # Test in a separate repository by referencing your fork:
-# uses: YOUR_USERNAME/github-weekly-backup-action@your-branch
+# uses: YOUR_USERNAME/branch-backup-action@your-branch
 ```
 
-## 🧪 Testing
+## Testing
 
 Since this is a GitHub Action, testing requires:
 
@@ -73,7 +73,7 @@ Since this is a GitHub Action, testing requires:
 4. **Verify the backup** was created correctly
 5. **Check failure scenarios** (if applicable)
 
-## 📝 Documentation
+## Documentation
 
 When contributing:
 
@@ -82,11 +82,11 @@ When contributing:
 - **Update CHANGELOG.md** following [Keep a Changelog](https://keepachangelog.com/) format
 - **Update action.yml** if adding new inputs or changing outputs
 
-## 📄 License
+## License
 
 By contributing, you agree that your contributions will be licensed under the MIT License.
 
-## 🙏 Alternative Approaches
+## Alternative Approaches
 
 If you need:
 - **Faster iteration** - Consider forking for your specific needs
