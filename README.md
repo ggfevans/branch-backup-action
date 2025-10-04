@@ -30,6 +30,57 @@ jobs:
 
 Creates branches named `{branch}-backup-YYYY-MM-DD` with annotated tags. Manual trigger available in Actions tab.
 
+## Personal Access Token Setup
+
+This action requires a [fine-grained personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token) with specific permissions to create branches and tags.
+
+### Required Permissions
+
+The token must have access to your repository with these permissions:
+
+- **Metadata**: Read access
+- **Contents**: Read and Write access
+- **Pull requests**: Read and Write access  
+- **Actions**: Read and Write access
+
+### Setup Steps
+
+1. Go to [GitHub Settings > Developer settings > Personal access tokens > Fine-grained tokens](https://github.com/settings/personal-access-tokens/new)
+2. Click **Generate new token**
+3. **Token name**: Enter a descriptive name (e.g., "Branch Backup Action")
+4. **Expiration**: Set expiration (or "No expiration" if allowed by your organization)
+5. **Resource owner**: Select the account/organization that owns your repository
+6. **Repository access**: Select "Selected repositories" and choose your target repository
+7. **Permissions**: Under "Repository permissions", set:
+   - **Metadata**: Read
+   - **Contents**: Read and write
+   - **Pull requests**: Read and write
+   - **Actions**: Read and write
+8. Click **Generate token**
+9. Copy the token immediately (you won't see it again)
+
+### Using the Token
+
+**Option 1 - Default (Recommended):**
+Use the built-in `GITHUB_TOKEN` with proper workflow permissions (as shown in the usage example above).
+
+**Option 2 - Custom Token:**
+If you need a custom token, add it to your repository secrets and reference it:
+
+```yaml
+steps:
+  - uses: ggfevans/branch-backup-action@v1
+    with:
+      github-token: ${{ secrets.BACKUP_TOKEN }}
+```
+
+### Security Notes
+
+- Fine-grained tokens are more secure than classic tokens
+- Only grant the minimum required permissions
+- Set reasonable expiration dates
+- Store tokens in repository secrets, never in code
+
 ## For Obsidian Users
 
 Protects against accidental deletions, sync conflicts, and failed plugin updates:
