@@ -124,6 +124,16 @@ cron: '0 0 * * 1'  # Every Monday instead of Sunday
 - **You decide**: Only you know which backups are safe to remove
 - **Recovery priority**: Better to have too many backups than too few
 
+### Repository Size Considerations
+
+GitHub recommends staying within [repository size limits](https://docs.github.com/en/repositories/creating-and-managing-repositories/repository-limits#repository-size) for optimal performance:
+
+- **Repository size**: 10GB on-disk size (.git folder) recommended maximum
+- **Branch limit**: 5,000 branches maximum (this action creates ~52 branches per year)
+- **Performance impact**: Large repositories can slow fetch operations and increase clone times
+
+Since this action creates one branch per week, you'll have approximately 52 backup branches per year, which is well within GitHub's limits. Monitor your repository size periodically if you have a large codebase.
+
 ### Manual Cleanup (Optional)
 
 If you need to manage storage, you can manually delete old backups:
