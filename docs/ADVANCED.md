@@ -25,7 +25,7 @@ jobs:
       contents: write
       issues: write
     steps:
-      - uses: ggfevans/branch-backup-action@v0.1
+      - uses: ggfevans/branch-backup-action@v1
         with:
           backup-prefix: ${{ env.BACKUP_PREFIX }}
           branch-to-backup: ${{ env.BRANCH_TO_BACKUP }}
@@ -81,7 +81,7 @@ jobs:
   backup:
     runs-on: ubuntu-latest
     steps:
-      - uses: ggfevans/branch-backup-action@v0.1
+      - uses: ggfevans/branch-backup-action@v1
         with:
           backup-prefix: 'pre-deploy'
           

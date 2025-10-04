@@ -25,7 +25,7 @@ jobs:
       contents: write
       issues: write
     steps:
-      - uses: ggfevans/branch-backup-action@v0.1
+      - uses: ggfevans/branch-backup-action@v1
 ```
 
 Creates branches named `{branch}-backup-YYYY-MM-DD` with annotated tags. Manual trigger available in Actions tab.
@@ -42,7 +42,7 @@ git checkout main                    # Return to current
 ## Configuration
 
 ```yaml
-- uses: ggfevans/branch-backup-action@v0.1
+- uses: ggfevans/branch-backup-action@v1
   with:
     backup-prefix: 'snapshot'     # Default: 'backup'
     branch-to-backup: 'develop'   # Default: 'main'
