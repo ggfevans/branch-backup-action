@@ -18,6 +18,8 @@ Creates weekly Git branch snapshots with metadata. Originally built for my Obsid
 
 ## Usage
 
+### Option 1: Use the Action Directly
+
 Add to `.github/workflows/backup.yml`:
 
 ```yaml
@@ -38,6 +40,16 @@ jobs:
 ```
 
 Creates branches named `{branch}-backup-YYYY-MM-DD` with annotated tags. Manual trigger available in Actions tab.
+
+### Option 2: Use as Template
+
+If you prefer to have your own copy for customization:
+
+1. Click **[Use this template](https://github.com/ggfevans/branch-backup-action/generate)** to create your own repository
+2. Modify `action.yml` and documentation as needed
+3. Reference your custom action: `uses: YOUR_USERNAME/branch-backup-action@main`
+
+This gives you full control to customize the backup logic, scheduling, or metadata collection.
 
 ## Personal Access Token Setup
 
