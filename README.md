@@ -7,6 +7,15 @@ Creates weekly Git branch snapshots with metadata. Originally built for my Obsid
 
 **Personal project shared as-is.** Limited support, forks welcome.
 
+## What It Does
+
+- **Automated backups**: Creates `{branch}-backup-YYYY-MM-DD` branches every Sunday at midnight UTC
+- **Rich metadata**: Annotated tags with commit statistics (commits, contributors, files changed)
+- **Failure handling**: Creates GitHub issues automatically when backup fails
+- **Manual triggers**: Run backups on-demand via the Actions tab
+- **Permanent retention**: Keeps all backups indefinitely for maximum safety
+- **Branch naming**: Includes source branch name for easy identification
+
 ## Usage
 
 Add to `.github/workflows/backup.yml`:
@@ -104,16 +113,20 @@ Change schedule:
 cron: '0 0 * * 1'  # Every Monday instead of Sunday
 ```
 
-## What It Does
+## Storage Policy
 
-- Creates `{branch}-backup-YYYY-MM-DD` branches every Sunday
-- Annotated tags with commit stats (commits, contributors, files changed)
-- Creates GitHub issues on failure
-- Keeps all backups indefinitely
+**This action intentionally keeps all backups indefinitely.** We do not automatically delete any backup branches or tags due to the inherent risk of data loss.
 
-## Storage
+### Why No Automatic Cleanup?
 
-Backups accumulate over time. Clean up old ones manually:
+- **Safety first**: Backups are worthless if they're accidentally deleted
+- **Storage is cheap**: Git branches and tags are lightweight references
+- **You decide**: Only you know which backups are safe to remove
+- **Recovery priority**: Better to have too many backups than too few
+
+### Manual Cleanup (Optional)
+
+If you need to manage storage, you can manually delete old backups:
 ```bash
 git push origin --delete main-backup-2025-01-01
 git push origin --delete refs/tags/main-backup-2025-01-01
