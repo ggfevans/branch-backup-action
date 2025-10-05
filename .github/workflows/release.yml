@@ -1,0 +1,313 @@
+# MIT License
+#
+# Copyright (c) 2025 Gareth Evans
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+name: Release and Publish
+
+on:
+  # Manual release trigger
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.2.0)'
+        required: true
+        type: string
+      release_type:
+        description: 'Type of release'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - 'release'
+          - 'prerelease'
+      generate_notes:
+        description: 'Auto-generate release notes'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: read
+
+jobs:
+  validate:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.validate.outputs.version }}
+      is_prerelease: ${{ steps.validate.outputs.is_prerelease }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          fetch-depth: 0
+
+      - name: Validate version and inputs
+        id: validate
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          
+          # Ensure version starts with 'v'
+          if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-.*)?$ ]]; then
+            echo "Error: Version must follow semantic versioning (e.g., v1.2.0, v1.2.0-beta.1)"
+            exit 1
+          fi
+          
+          # Check if version already exists
+          if git tag | grep -q "^${VERSION}$"; then
+            echo "Error: Version ${VERSION} already exists"
+            exit 1
+          fi
+          
+          # Set outputs
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          
+          if [[ "${{ github.event.inputs.release_type }}" == "prerelease" ]]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "✅ Version ${VERSION} is valid and available"
+
+      - name: Validate action.yml
+        run: |
+          if [ ! -f action.yml ]; then
+            echo "Error: action.yml not found"
+            exit 1
+          fi
+          
+          # Check required fields
+          required_fields=("name" "description" "runs")
+          for field in "${required_fields[@]}"; do
+            if ! grep -q "^${field}:" action.yml; then
+              echo "Error: action.yml missing required field: ${field}"
+              exit 1
+            fi
+          done
+          
+          echo "✅ action.yml validation passed"
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: validate
+    outputs:
+      release_id: ${{ steps.create_release.outputs.release_id }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          fetch-depth: 0
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          VERSION="${{ needs.validate.outputs.version }}"
+          
+          # Get the last release tag
+          LAST_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1 || echo "")
+          
+          if [ -z "$LAST_TAG" ]; then
+            echo "No previous release found, generating notes from beginning"
+            COMMIT_RANGE="HEAD"
+          else
+            echo "Last release: $LAST_TAG"
+            COMMIT_RANGE="${LAST_TAG}..HEAD"
+          fi
+          
+          # Generate release notes
+          {
+            echo "# Release ${VERSION}"
+            echo ""
+            echo "## Changes"
+            echo ""
+            
+            # Group commits by type
+            git log --format="%s" $COMMIT_RANGE | while read -r commit; do
+              case "$commit" in
+                feat:*|feature:*)
+                  echo "### Features"
+                  echo "- ${commit#*: }"
+                  ;;
+                fix:*)
+                  echo "### Bug Fixes" 
+                  echo "- ${commit#*: }"
+                  ;;
+                security:*)
+                  echo "### Security"
+                  echo "- ${commit#*: }"
+                  ;;
+                docs:*)
+                  echo "### Documentation"
+                  echo "- ${commit#*: }"
+                  ;;
+                *)
+                  echo "### Other Changes"
+                  echo "- $commit"
+                  ;;
+              esac
+            done
+            
+            echo ""
+            echo "## Installation"
+            echo ""
+            echo '```yaml'
+            echo "- uses: ggfevans/branch-backup-action@${VERSION}"
+            echo '```'
+            echo ""
+            echo "## Full Changelog"
+            if [ -n "$LAST_TAG" ]; then
+              echo "https://github.com/${{ github.repository }}/compare/${LAST_TAG}...${VERSION}"
+            else
+              echo "https://github.com/${{ github.repository }}/commits/${VERSION}"
+            fi
+          } > release_notes.md
+          
+          echo "Generated release notes:"
+          cat release_notes.md
+
+      - name: Create GitHub release
+        id: create_release
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            const fs = require('fs');
+            const version = '${{ needs.validate.outputs.version }}';
+            const isPrerelease = ${{ needs.validate.outputs.is_prerelease }};
+            
+            let releaseNotes = '';
+            if (${{ github.event.inputs.generate_notes }}) {
+              releaseNotes = fs.readFileSync('release_notes.md', 'utf8');
+            }
+            
+            const release = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: version,
+              name: version,
+              body: releaseNotes,
+              draft: false,
+              prerelease: isPrerelease,
+              generate_release_notes: !${{ github.event.inputs.generate_notes }}
+            });
+            
+            core.setOutput('release_id', release.data.id);
+            core.setOutput('upload_url', release.data.upload_url);
+            
+            console.log(`Created release ${version} with ID ${release.data.id}`);
+
+  update_major_version:
+    name: Update Major Version Tag
+    runs-on: ubuntu-latest
+    needs: [validate, release]
+    if: needs.validate.outputs.is_prerelease == 'false'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          fetch-depth: 0
+
+      - name: Update major version tag
+        run: |
+          VERSION="${{ needs.validate.outputs.version }}"
+          
+          # Extract major version (v1.2.3 -> v1)
+          MAJOR_VERSION=$(echo $VERSION | sed -E 's/^v([0-9]+)\..*/v\1/')
+          
+          echo "Updating major version tag: $MAJOR_VERSION"
+          
+          # Delete existing major version tag if it exists
+          if git tag | grep -q "^${MAJOR_VERSION}$"; then
+            git tag -d $MAJOR_VERSION
+            git push origin --delete $MAJOR_VERSION || true
+          fi
+          
+          # Create new major version tag
+          git tag $MAJOR_VERSION
+          git push origin $MAJOR_VERSION
+          
+          echo "✅ Updated major version tag $MAJOR_VERSION to point to $VERSION"
+
+  notify:
+    name: Post-Release Notifications
+    runs-on: ubuntu-latest
+    needs: [validate, release, update_major_version]
+    if: always() && needs.release.result == 'success'
+    
+    steps:
+      - name: Create success issue
+        if: needs.validate.outputs.is_prerelease == 'false'
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            const version = '${{ needs.validate.outputs.version }}';
+            const releaseUrl = `https://github.com/${{ github.repository }}/releases/tag/${version}`;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Release ${version} Published Successfully`,
+              body: `## Release ${version} is now available!
+              
+              🎉 **New release published**: [${version}](${releaseUrl})
+              
+              ### For Users
+              Update your workflows to use the latest version:
+              \`\`\`yaml
+              - uses: ggfevans/branch-backup-action@${version}
+              \`\`\`
+              
+              ### For Maintainers
+              - [ ] Update marketplace listing if needed
+              - [ ] Monitor for any issues with new release
+              - [ ] Update documentation if breaking changes
+              
+              **Release URL**: ${releaseUrl}
+              **Workflow Run**: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+              
+              ---
+              *This issue was automatically created by the release workflow.*`,
+              labels: ['release', 'published', 'maintenance']
+            });
+
+      - name: Summary
+        run: |
+          VERSION="${{ needs.validate.outputs.version }}"
+          IS_PRERELEASE="${{ needs.validate.outputs.is_prerelease }}"
+          RELEASE_URL="https://github.com/${{ github.repository }}/releases/tag/${VERSION}"
+          
+          echo "## Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${VERSION}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Type**: $([ "$IS_PRERELEASE" = "true" ] && echo "Pre-release" || echo "Release")" >> $GITHUB_STEP_SUMMARY
+          echo "- **Release URL**: [${VERSION}](${RELEASE_URL})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "- Release is now available on GitHub Marketplace" >> $GITHUB_STEP_SUMMARY
+          echo "- Major version tag updated (if applicable)" >> $GITHUB_STEP_SUMMARY
+          echo "- Users can now reference ${VERSION} in their workflows" >> $GITHUB_STEP_SUMMARY
