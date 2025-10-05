@@ -1,5 +1,7 @@
 # Contributing
 
+> **AI Assistance**: This project uses AI tools as development aids while maintaining full human oversight. See [AI_ACKNOWLEDGMENT.md](AI_ACKNOWLEDGMENT.md) for details.
+
 Thanks for your interest in contributing to the Weekly GitHub Branch Backup action!
 
 ## Important Notice

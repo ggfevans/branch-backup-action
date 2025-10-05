@@ -268,6 +268,10 @@ git checkout -b recovery-branch  # Work from backup
 - Ensure workflow has `contents: write` and `issues: write` permissions
 - See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 
+## AI Assistance Acknowledgment
+
+This project uses AI tools (Claude, GitHub Copilot) as development aids while maintaining full human oversight. All code, decisions, and releases are human-controlled. See [AI_ACKNOWLEDGMENT.md](AI_ACKNOWLEDGMENT.md) for details.
+
 ## License
 
 MIT - see [LICENSE](LICENSE)
