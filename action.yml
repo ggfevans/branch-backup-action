@@ -1,10 +1,10 @@
-name: 'Weekly Branch Backup'
+name: 'Branch Backup'
 description: 'Create weekly snapshot branches with rich metadata tracking for Git repositories'
-author: 'gevans'
+author: 'ggfevans'
 
 branding:
   icon: 'git-branch'
-  color: 'blue'
+  color: 'green'
 
 inputs:
   backup-prefix:
