@@ -22,6 +22,21 @@ inputs:
     required: false
     default: ${{ github.token }}
 
+  backup-obsidian-config:
+    description: 'Include .obsidian folder in backup'
+    required: false
+    default: 'true'
+
+  exclude-workspace:
+    description: 'Exclude workspace files from backup'
+    required: false
+    default: 'true'
+
+  create-gitignore:
+    description: 'Create recommended .gitignore for Obsidian vaults'
+    required: false
+    default: 'false'
+
 outputs:
   backup-branch:
     description: 'Name of the created backup branch'
@@ -34,6 +49,14 @@ outputs:
   commit-sha:
     description: 'SHA of the commit that was backed up'
     value: ${{ steps.backup.outputs.commit }}
+
+  vault-size:
+    description: 'Size of the repository/vault in MB'
+    value: ${{ steps.backup.outputs.vault_size }}
+
+  files-changed:
+    description: 'Number of files changed since last backup'
+    value: ${{ steps.backup.outputs.files_changed }}
 
 runs:
   using: 'composite'

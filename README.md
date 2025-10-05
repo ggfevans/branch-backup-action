@@ -54,6 +54,28 @@ git checkout main                    # Return to current work
 
 **Personal project shared as-is.** Limited support, forks welcome.
 
+## How It Works
+
+```mermaid
+flowchart TD
+    A["⏰ Schedule Trigger<br/>(Sunday 00:00 UTC)"] --> B["📥 Checkout Repository"]
+    B --> C["🔍 Get Current Commit"]
+    C --> D["📝 Collect Metadata<br/>(commits, contributors, files)"]
+    D --> E["🌿 Create Backup Branch<br/>{branch}-backup-YYYY-MM-DD"]
+    E --> F["🏷️ Create Annotated Tag<br/>with metadata"]
+    F --> G["📤 Push Branch & Tag"]
+    G --> H["📊 Generate Summary"]
+    G --> I["❌ Create Issue<br/>(on failure only)"]
+    
+    style A fill:#e1f5fe
+    style E fill:#f3e5f5
+    style F fill:#f3e5f5
+    style G fill:#e8f5e8
+    style I fill:#ffebee
+```
+
+**Result:** Your repository gets a permanent snapshot with rich metadata, accessible as a regular Git branch.
+
 ## What It Does
 
 - **Automated backups**: Creates `{branch}-backup-YYYY-MM-DD` branches every Sunday at midnight UTC
