@@ -53,7 +53,7 @@ Comprehensive troubleshooting guide for the Weekly GitHub Branch Backup action.
 2. **Branch protection bypass**:
    ```yaml
    # Option 1: Use admin token
-   - uses: actions/checkout@v4
+   - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
      with:
        token: ${{ secrets.ADMIN_TOKEN }}
    
@@ -115,7 +115,7 @@ git push origin --delete refs/tags/main-backup-2024-01-01
 **Optimizations**:
 ```yaml
 # Reduce fetch depth if full history isn't needed
-- uses: actions/checkout@v4
+- uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
   with:
     fetch-depth: 100  # Instead of 0 (full history)
 ```
