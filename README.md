@@ -1,6 +1,6 @@
 # Branch Backup Action
 
-[![License](https://img.shields.io/github/license/ggfevans/branch-backup-action)](LICENSE)
+[![License](https://img.shields.io/github/license/ggfevans/branch-backup-action)](https://github.com/ggfevans/branch-backup-action/blob/main/LICENSE)
 [![Release](https://img.shields.io/github/v/release/ggfevans/branch-backup-action)](https://github.com/ggfevans/branch-backup-action/releases)
 
 Creates weekly Git branch snapshots with metadata. Originally built for my Obsidian vault, works with any repository.
