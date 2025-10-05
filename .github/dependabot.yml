@@ -28,10 +28,13 @@ updates:
     # Group security updates for faster processing
     groups:
       security-updates:
+        applies-to: security-updates
         patterns:
           - "*"
         update-types:
-          - "security-update"
+          - "major"
+          - "minor"
+          - "patch"
       # Group patch updates to reduce PR noise
       patch-updates:
         patterns:
