@@ -48,6 +48,22 @@ jobs:
 
 Done. Your repository now has automatic weekly backups.
 
+## Versioning
+
+**Recommended:** Pin to a specific version for reproducible builds:
+```yaml
+- uses: ggfevans/branch-backup-action@v1.3.0
+```
+
+**Convenience:** Use floating major version tag (auto-updated):
+```yaml
+- uses: ggfevans/branch-backup-action@v1
+```
+
+**Available tags:**
+- `v1.3.0`, `v1.2.0`, `v1.1.0` (immutable release versions)
+- `v1.3`, `v1` (floating tags, updated on each release)
+
 ## Features
 
 - Automated weekly snapshots on schedule
