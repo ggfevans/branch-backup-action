@@ -15,7 +15,7 @@ inputs:
   branch-to-backup:
     description: 'Branch to create backups from'
     required: false
-    default: 'main'
+    default: 'prod'
 
   github-token:
     description: 'GitHub token for repository access'
