@@ -1,0 +1,69 @@
+name: Update floating tags on release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  retag:
+    runs-on: ubuntu-latest
+    if: github.event.release.prerelease == false && github.event.release.draft == false
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      
+      - name: Compute floating tags
+        id: semver
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          echo "Processing release tag: $TAG"
+          
+          # Expect TAG like v1.2.3
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Tag $TAG does not match expected semver format (v1.2.3)"
+            exit 1
+          fi
+          
+          MAJOR="${TAG%%.*}"            # v1
+          MINOR="${TAG%.*}"             # v1.2
+          
+          echo "major=$MAJOR" >> $GITHUB_OUTPUT
+          echo "minor=$MINOR" >> $GITHUB_OUTPUT
+          echo "Will update floating tags: $MAJOR and $MINOR"
+      
+      - name: Move floating tags
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          MAJOR="${{ steps.semver.outputs.major }}"
+          MINOR="${{ steps.semver.outputs.minor }}"
+          
+          echo "Updating floating tags to point to $TAG..."
+          
+          # Update major tag (e.g., v1)
+          git tag -fa "$MAJOR" -m "Update $MAJOR to $TAG"
+          echo "✅ Updated $MAJOR tag"
+          
+          # Update minor tag (e.g., v1.3)  
+          git tag -fa "$MINOR" -m "Update $MINOR to $TAG"
+          echo "✅ Updated $MINOR tag"
+          
+          # Push the updated tags
+          git push origin -f "$MAJOR"
+          echo "✅ Pushed $MAJOR tag"
+          
+          git push origin -f "$MINOR"
+          echo "✅ Pushed $MINOR tag"
+          
+          echo "🎉 Floating tags updated successfully!"
