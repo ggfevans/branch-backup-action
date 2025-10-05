@@ -101,6 +101,7 @@ steps:
 - Only grant the minimum required permissions
 - Set reasonable expiration dates
 - Store tokens in repository secrets, never in code
+- All action dependencies are pinned to full commit SHAs for supply chain security
 
 ## For Obsidian Users
 
