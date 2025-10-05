@@ -2,8 +2,8 @@
 
 ## Summary
 
-- **prod** is the release branch and is heavily protected. No direct pushes. Changes land only via pull requests with required reviews and status checks.
-- **dev** is the default development branch. All feature work branches from dev and merges back into dev via pull requests.
+- **prod** is the default and release branch. It is heavily protected with no direct pushes. Changes land only via pull requests with required reviews and status checks.
+- **dev** is the active development branch. All feature work branches from dev and merges back into dev via pull requests.
 - **Feature branches** use descriptive prefixes such as `update`, `fix`, `docs`, `chore`. Example: `update/update-branch-naming`.
 
 ## Backup and Tagging
@@ -35,9 +35,14 @@
 - Consider enabling linear history and signed commits.
 
 ### dev
-- Default branch. Require status checks to pass.
+- Active development branch. Require status checks to pass.
 - Pull requests required for merging changes.
 - Direct pushes may be restricted according to team policy.
+
+### Default Branch
+- **prod** is the repository default branch
+- Workflows (like backups) run from prod for stability
+- GitHub shows prod branch by default when viewing the repository
 
 ## Naming Conventions
 
