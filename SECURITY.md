@@ -4,9 +4,17 @@
 
 This project follows semantic versioning. Security updates are provided for the latest major version.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.x.x   | :white_check_mark: |
+| Version | Supported          | Security Updates | End of Life |
+| ------- | ------------------ | --------------- | ----------- |
+| 1.x.x   | :white_check_mark: | Active          | TBD         |
+| 0.x.x   | :x:                | None            | 2025-10-04  |
+
+### Security Update Policy
+
+- **Critical vulnerabilities**: Patched within 48 hours when possible
+- **High severity issues**: Patched within 7 days
+- **Medium/Low severity**: Included in next regular release
+- **Security advisories**: Published for all severity levels
 
 ## Reporting a Vulnerability
 
@@ -60,13 +68,105 @@ Out of scope:
 - General GitHub Actions platform vulnerabilities
 - Social engineering attacks
 
+## Security Monitoring
+
+### OpenSSF Scorecard
+
+This repository is monitored using [OpenSSF Scorecard](https://github.com/ossf/scorecard) for supply chain security assessment. The scorecard evaluates various security practices and provides a numerical score.
+
+**Current Security Metrics:**
+- Automated security scanning: Weekly
+- Dependency vulnerability scanning: Enabled via Dependabot
+- Code review requirements: Enforced on main branch
+- Pinned dependencies: All action dependencies use full commit SHAs
+
+### Security Scanning
+
+- **CodeQL Analysis**: Automated static analysis for code vulnerabilities
+- **Dependency Scanning**: Dependabot monitors for vulnerable dependencies  
+- **Supply Chain Security**: OpenSSF Scorecard evaluates security posture
+- **Branch Protection**: Main branch requires reviews and status checks
+
+## Supply Chain Security
+
+### Action Dependencies
+
+All GitHub Actions used by this project are pinned to specific commit SHAs:
+
+```yaml
+# Example: Pinned to specific commit SHA instead of version tag
+uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+```
+
+### Verification
+
+To verify the integrity of this action:
+
+1. **Check commit signatures**: All commits to main branch are verified
+2. **Review pinned dependencies**: All action dependencies use full commit SHAs
+3. **Validate checksums**: Release artifacts include checksums for verification
+
 ## Security Best Practices
 
-When using this action:
+### For Action Users
 
-1. **Review Permissions**: Only grant necessary permissions (`contents: write`, `issues: write`)
-2. **Pin Versions**: Use specific version tags rather than `@main` in production
-3. **Audit Logs**: Monitor your repository's audit logs for unexpected activity
-4. **Limit Access**: Restrict who can modify workflow files in your repository
+1. **Pin to specific versions**: Always use tagged releases, not branch names
+   ```yaml
+   # Good: Pinned to specific version
+   uses: ggfevans/branch-backup-action@v1.1.0
+   
+   # Avoid: Using branch names
+   uses: ggfevans/branch-backup-action@main
+   ```
+
+2. **Review permissions**: Only grant necessary permissions
+   ```yaml
+   permissions:
+     contents: write    # Required for creating branches/tags
+     issues: write      # Required for failure notifications only
+   ```
+
+3. **Monitor audit logs**: Regularly review repository audit logs for unexpected activity
+
+4. **Restrict workflow access**: Limit who can modify `.github/workflows/` files
+
+5. **Validate action behavior**: Test in a non-production environment first
+
+### For Repository Administrators
+
+1. **Enable branch protection**: Protect main branch with required reviews
+2. **Configure Dependabot**: Enable security updates for dependencies
+3. **Monitor security advisories**: Subscribe to repository security notifications
+4. **Regular security reviews**: Periodically audit workflow configurations
+
+## Security Architecture
+
+### Trust Boundaries
+
+```
+GitHub Actions Runner
+  ├─ Repository Contents (trusted)
+  ├─ Action Dependencies (verified via SHA pinning)
+  ├─ GitHub Token (scoped permissions)
+  └─ Generated Artifacts (branches/tags only)
+```
+
+### Data Flow Security
+
+1. **Input validation**: All user inputs are sanitized before shell execution
+2. **Output sanitization**: Action outputs are controlled and validated
+3. **No external network calls**: Action operates entirely within GitHub ecosystem
+4. **Minimal token scope**: Uses standard `GITHUB_TOKEN` with minimal permissions
+
+### Threat Model
+
+**Potential threats and mitigations:**
+
+| Threat | Likelihood | Impact | Mitigation |
+|--------|------------|--------|-----------|
+| Malicious dependency | Low | High | SHA pinning, automated scanning |
+| Code injection | Medium | High | Input sanitization, ShellCheck linting |
+| Token compromise | Low | Medium | Minimal permissions, audit logging |
+| Workflow manipulation | Medium | Medium | Branch protection, code review |
 
 Thank you for helping keep this project secure!
