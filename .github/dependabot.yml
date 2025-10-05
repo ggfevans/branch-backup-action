@@ -1,18 +1,48 @@
+# Dependabot configuration for automated dependency updates
+# Monitors GitHub Actions dependencies across workflows and action.yml
+# Reference: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+
 version: 2
 updates:
-  # GitHub Actions dependencies
+  # GitHub Actions dependencies in workflows and action.yml
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "09:00"
+      timezone: "America/Los_Angeles"
     commit-message:
-      prefix: "chore"
+      prefix: "deps"
+      prefix-development: "deps-dev"
       include: "scope"
     reviewers:
-      - "gevans"
+      - "ggfevans"
+    assignees:
+      - "ggfevans"
     labels:
       - "dependencies"
+      - "security"
       - "github-actions"
     open-pull-requests-limit: 5
+    # Group security updates for faster processing
+    groups:
+      security-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "security-update"
+      # Group patch updates to reduce PR noise
+      patch-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+    # Allow both version updates and security updates
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    # Automatically rebase PRs when conflicts occur
+    rebase-strategy: "auto"
+    # Target main branch for updates
+    target-branch: "main"
