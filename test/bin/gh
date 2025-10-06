@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# gh shim for testing
+# This shim records invocations and can be configured to succeed or fail
+
+# Create log file if it doesn't exist
+log_file="${BATS_TEST_TMPDIR}/gh_invocations.log"
+touch "$log_file"
+
+# Log the invocation
+echo "gh $*" >> "$log_file"
+
+# Check if we should fail (for negative tests)
+if [[ "${GH_FAIL:-}" == "true" ]]; then
+    echo "gh: simulated failure" >&2
+    exit 1
+fi
+
+# Default success
+exit 0

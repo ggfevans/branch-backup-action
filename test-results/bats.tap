@@ -1,0 +1,21 @@
+1..20
+ok 1 inputs: defaults applied when not provided in 88ms
+ok 2 inputs: accepts valid backup prefix in 91ms
+ok 3 inputs: accepts alphanumeric, dash, and underscore in backup prefix in 89ms
+ok 4 inputs: trims whitespace from inputs in 95ms
+ok 5 inputs: rejects empty backup prefix after trimming in 114ms
+ok 6 inputs: rejects backup prefix with spaces in 113ms
+ok 7 inputs: rejects backup prefix with special characters in 108ms
+ok 8 inputs: rejects path traversal in backup prefix in 108ms
+ok 9 inputs: rejects empty branch name in 109ms
+ok 10 inputs: rejects empty branch name after trimming in 107ms
+ok 11 inputs: handles missing github token gracefully in 84ms
+ok 12 inputs: uses fallback GITHUB_TOKEN when INPUT_GITHUB_TOKEN not set in 86ms
+ok 13 inputs: INPUT_GITHUB_TOKEN takes precedence over GITHUB_TOKEN in 85ms
+ok 14 inputs: does not leak github token in output or error messages in 92ms
+ok 15 date: uses current date when BBA_DATE_OVERRIDE not set in 92ms
+ok 16 date: respects BBA_DATE_OVERRIDE for testing in 91ms
+ok 17 date: BBA_DATE_OVERRIDE overrides system date in -1759701901312ms
+ok 18 inputs: exports variables for use by other functions in 89ms
+ok 19 inputs: validates extremely long prefix in 85ms
+ok 20 inputs: handles unicode characters in prefix in 108ms
