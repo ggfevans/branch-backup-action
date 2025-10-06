@@ -37,9 +37,9 @@ run_action_steps() {
     # Step 1: Checkout (simulated - we're already in the repo)
     git checkout "$branch_to_backup"
     
-    # Step 2: Configure Git
-    git config --global user.name "github-actions[bot]"
-    git config --global user.email "github-actions[bot]@users.noreply.github.com"
+    # Step 2: Configure Git (local to test repo)
+    git config --local user.name "github-actions[bot]"
+    git config --local user.email "github-actions[bot]@users.noreply.github.com"
     
     # Step 3: Create backup branch (extracted from action.yml)
     export BACKUP_DATE
