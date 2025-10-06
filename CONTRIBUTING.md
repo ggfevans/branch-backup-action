@@ -67,13 +67,44 @@ cd branch-backup-action
 
 ## Testing
 
-Since this is a GitHub Action, testing requires:
+### Automated Test Suite
 
-1. **Create a test repository** or use an existing one
-2. **Add your modified action** to a workflow in that repository
-3. **Run the workflow** manually or wait for scheduled execution
-4. **Verify the backup** was created correctly
-5. **Check failure scenarios** (if applicable)
+This project now includes a comprehensive test suite using BATS (Bash Automated Testing System):
+
+```bash
+# Clone with test framework submodules
+git clone --recurse-submodules https://github.com/ggfevans/branch-backup-action.git
+cd branch-backup-action
+
+# Setup development environment
+make setup
+
+# Run all tests
+make test
+
+# Run specific test types
+make test-unit        # Unit tests for shell logic
+make test-integration # End-to-end workflow tests
+make lint            # Shell script linting
+```
+
+### Test Structure
+
+- **Unit Tests** (`test/unit/shell_logic.bats`): Test individual shell snippets from `action.yml`
+- **Integration Tests** (`test/integration/action_e2e.bats`): Test complete workflows
+- **Test Helpers** (`test/helpers/`): Utilities for GitHub Actions simulation
+- **CI Workflow** (`.github/workflows/ci.yml`): Automated testing on PR/push
+
+### Manual Testing
+
+For comprehensive testing of changes:
+
+1. **Run automated tests**: `make test`
+2. **Create a test repository** or use an existing one
+3. **Add your modified action** to a workflow in that repository
+4. **Run the workflow** manually or wait for scheduled execution
+5. **Verify the backup** was created correctly
+6. **Check failure scenarios** (if applicable)
 
 ## Documentation
 
