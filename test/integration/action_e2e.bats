@@ -40,6 +40,7 @@ run_action_steps() {
     # Step 2: Configure Git (local to test repo)
     git config --local user.name "github-actions[bot]"
     git config --local user.email "github-actions[bot]@users.noreply.github.com"
+    git config --local commit.gpgsign false
     
     # Step 3: Create backup branch (extracted from action.yml)
     export BACKUP_DATE
@@ -62,15 +63,14 @@ run_action_steps() {
     if git ls-remote --heads origin "${BACKUP_BRANCH}" | grep -q "${BACKUP_BRANCH}"; then
         echo "status=skipped" >> "$GITHUB_OUTPUT"
         echo "⏭️ Backup branch ${BACKUP_BRANCH} already exists"
-        return 0
+    else
+        # Create and push backup branch
+        git checkout -b "${BACKUP_BRANCH}"
+        git push origin "${BACKUP_BRANCH}"
+        
+        echo "status=created" >> "$GITHUB_OUTPUT"
+        echo "✅ Successfully created backup branch: ${BACKUP_BRANCH}"
     fi
-    
-    # Create and push backup branch
-    git checkout -b "${BACKUP_BRANCH}"
-    git push origin "${BACKUP_BRANCH}"
-    
-    echo "status=created" >> "$GITHUB_OUTPUT"
-    echo "✅ Successfully created backup branch: ${BACKUP_BRANCH}"
     
     # Step 4: Create backup tag (if status is created)
     local status

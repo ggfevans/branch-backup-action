@@ -1,54 +1,13 @@
 1..12
-ok 1 branch naming: basic branch name generation in 70ms
-ok 2 branch naming: sanitizes slashes in branch names in 68ms
-ok 3 branch naming: handles multiple slashes in 69ms
-ok 4 branch naming: preserves other characters in 67ms
-ok 5 date generation: uses current date when no override in 68ms
-ok 6 github outputs: writes correct format in 95ms
-not ok 7 metadata calculation: statistics gathering in 30837ms
-# (from function `create_test_commit' in file test/helpers/git.bash, line 44,
-#  in test file test/unit/shell_logic.bats, line 109)
-#   `create_test_commit "Commit 1" "file1.txt" "content 1"' failed with status 128
-# error: 1Password: agent returned an error
-#
-# fatal: failed to write commit object
-not ok 8 metadata calculation: handles edge case with no commits in 186ms
-# (in test file test/unit/shell_logic.bats, line 130)
-#   `COMMITS_THIS_WEEK=$(git log --since='7 days ago' --oneline | wc -l)' failed with status 128
-# fatal: your current branch 'main' does not have any commits yet
-ok 9 tag message: generates correct format in 60ms
-not ok 10 summary generation: creates correct markdown structure in 105ms
-# (from function `assert_summary_contains' in file test/helpers/asserts.bash, line 51,
-#  in test file test/unit/shell_logic.bats, line 204)
-#   `assert_summary_contains "- Date: \`2024-01-02\`"' failed
-# ## Weekly Backup Report
-# ### ✅ Backup Created Successfully
-# **Details:**
-# grep: invalid option --
-# usage: grep [-abcdDEFGHhIiJLlMmnOopqRSsUVvwXxZz] [-A num] [-B num] [-C[num]]
-# 	[-e pattern] [-f file] [--binary-files=value] [--color=when]
-# 	[--context[=num]] [--directories=action] [--label] [--line-buffered]
-# 	[--null] [pattern] [file ...]
-# Expected summary text '- Date: `2024-01-02`' not found
-# Actual summary:
-# ## Weekly Backup Report
-#
-# ### ✅ Backup Created Successfully
-#
-# **Details:**
-# - Date: `2024-01-02`
-# - Branch: `main-backup-2024-01-02`
-# - Commit: `abc123def456`
-# - Source: `main`
-#
-# [View Backup Branch](https://github.com/testorg/testrepo/tree/main-backup-2024-01-02)
-ok 11 summary generation: handles skipped status in 67ms
-not ok 12 branch existence check: command format in 30881ms
-# (from function `create_test_commit' in file test/helpers/git.bash, line 44,
-#  in test file test/unit/shell_logic.bats, line 238)
-#   `create_test_commit "Initial commit"' failed with status 128
-# Initialized empty Git repository in /private/var/folders/qf/44y7vv_n0n39gk78zcyk7v6r0000gn/T/bats-run-AJsqS3/test/12/check-remote.git/
-# /var/folders/qf/44y7vv_n0n39gk78zcyk7v6r0000gn/T/bats-run-AJsqS3/test/12/check-remote.git
-# error: 1Password: agent returned an error
-#
-# fatal: failed to write commit object
+ok 1 branch naming: basic branch name generation
+ok 2 branch naming: sanitizes slashes in branch names
+ok 3 branch naming: handles multiple slashes
+ok 4 branch naming: preserves other characters
+ok 5 date generation: uses current date when no override
+ok 6 github outputs: writes correct format
+ok 7 metadata calculation: statistics gathering
+ok 8 metadata calculation: handles edge case with no commits
+ok 9 tag message: generates correct format
+ok 10 summary generation: creates correct markdown structure
+ok 11 summary generation: handles skipped status
+ok 12 branch existence check: command format

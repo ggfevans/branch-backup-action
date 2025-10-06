@@ -10,7 +10,7 @@ assert_github_output() {
     
     assert [ -f "$GITHUB_OUTPUT" ]
     
-    if grep -q "^${expected_name}=${expected_value}$" "$GITHUB_OUTPUT"; then
+    if grep -q -- "^${expected_name}=${expected_value}$" "$GITHUB_OUTPUT"; then
         return 0
     else
         echo "Expected GitHub output '$expected_name=$expected_value' not found"
@@ -26,7 +26,7 @@ assert_github_output_exists() {
     
     assert [ -f "$GITHUB_OUTPUT" ]
     
-    if grep -q "^${expected_name}=" "$GITHUB_OUTPUT"; then
+    if grep -q -- "^${expected_name}=" "$GITHUB_OUTPUT"; then
         return 0
     else
         echo "Expected GitHub output '$expected_name' not found"
@@ -42,7 +42,7 @@ assert_summary_contains() {
     
     assert [ -f "$GITHUB_STEP_SUMMARY" ]
     
-    if grep -F "$expected_text" "$GITHUB_STEP_SUMMARY"; then
+    if grep -F -- "$expected_text" "$GITHUB_STEP_SUMMARY"; then
         return 0
     else
         echo "Expected summary text '$expected_text' not found"
@@ -70,7 +70,7 @@ assert_branch_exists() {
 assert_remote_branch_exists() {
     local branch_name="$1"
     
-    if git ls-remote --heads origin "$branch_name" | grep -q "$branch_name"; then
+    if git ls-remote --heads origin "$branch_name" | grep -q -- "$branch_name"; then
         return 0
     else
         echo "Expected remote branch '$branch_name' does not exist"
@@ -113,7 +113,7 @@ assert_tag_message_contains() {
     local tag_message
     tag_message=$(git tag -l --format='%(contents)' "$tag_name")
     
-    if echo "$tag_message" | grep -q "$expected_text"; then
+    if echo "$tag_message" | grep -q -- "$expected_text"; then
         return 0
     else
         echo "Expected tag message to contain '$expected_text'"
@@ -128,7 +128,7 @@ assert_no_secrets_leaked() {
     local output="$1"
     local secret_pattern="${2:-fake-token}"
     
-    if echo "$output" | grep -q "$secret_pattern"; then
+    if echo "$output" | grep -q -- "$secret_pattern"; then
         echo "Secret leaked in output!"
         echo "Found pattern: $secret_pattern"
         echo "In output: $output"

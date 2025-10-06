@@ -27,6 +27,7 @@ configure_test_git_user() {
     git config user.email "test@example.com"
     git config init.defaultBranch main
     git config core.autocrlf false
+    git config commit.gpgsign false
 }
 
 # Create a commit with deterministic content and timestamp
