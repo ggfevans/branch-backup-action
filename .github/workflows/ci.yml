@@ -63,7 +63,7 @@ jobs:
       - name: Lint shell scripts
         run: |
           # Lint any shell scripts in test helpers
-          find test/helpers -name "*.bash" -exec shellcheck {} +
+          shellcheck -e SC1091 test/helpers/*.bash
           
           # Check action.yml shell scripts (extract and check basic syntax)
           echo "Shell scripts in action.yml appear syntactically valid"

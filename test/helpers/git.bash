@@ -11,14 +11,14 @@ create_test_repo() {
     # Ensure clean directory creation
     rm -rf "$repo_dir"
     mkdir -p "$repo_dir"
-    cd "$repo_dir"
+    cd "$repo_dir" || return 1
     
     # Initialize repo with consistent config
     git init --initial-branch="$initial_branch" --quiet >/dev/null 2>&1
     configure_test_git_user
     
     # Verify we're in the right place and return the path
-    echo "$(pwd)"
+    pwd
 }
 
 # Configure git user for testing (isolated from global config)
@@ -54,7 +54,8 @@ create_multiple_commits() {
     local base_date="2024-01-01T10:00:00"
     
     for ((i=1; i<=count; i++)); do
-        local timestamp=$(date -d "$base_date + $i hours" -u +"%Y-%m-%dT%H:%M:%S" 2>/dev/null || date -v+"${i}H" -j -f "%Y-%m-%dT%H:%M:%S" "$base_date" "+%Y-%m-%dT%H:%M:%S" 2>/dev/null || echo "$base_date")
+        local timestamp
+        timestamp=$(date -d "$base_date + $i hours" -u +"%Y-%m-%dT%H:%M:%S" 2>/dev/null || date -v+"${i}H" -j -f "%Y-%m-%dT%H:%M:%S" "$base_date" "+%Y-%m-%dT%H:%M:%S" 2>/dev/null || echo "$base_date")
         create_test_commit "Commit $i" "file$i.txt" "Content $i" "$timestamp"
     done
 }
@@ -80,7 +81,7 @@ setup_fake_remote() {
     git init --bare "$remote_dir"
     
     # Add remote to current repo
-    cd "$repo_dir"
+    cd "$repo_dir" || return 1
     git remote add origin "$remote_dir"
     
     echo "$remote_dir"
@@ -124,12 +125,13 @@ create_repo_with_history() {
     local repo_dir="${1:-$BATS_TEST_TMPDIR/history-repo}"
     
     create_test_repo "$repo_dir"
-    cd "$repo_dir"
+    cd "$repo_dir" || return 1
     
     # Create commits over the last week
     for i in {1..5}; do
         local days_ago=$((8-i))
-        local timestamp=$(date -d "$days_ago days ago" -u +"%Y-%m-%dT%H:%M:%S" 2>/dev/null || date -v-"${days_ago}d" "+%Y-%m-%dT%H:%M:%S" 2>/dev/null || echo "2024-01-0${i}T10:00:00")
+        local timestamp
+        timestamp=$(date -d "$days_ago days ago" -u +"%Y-%m-%dT%H:%M:%S" 2>/dev/null || date -v-"${days_ago}d" "+%Y-%m-%dT%H:%M:%S" 2>/dev/null || echo "2024-01-0${i}T10:00:00")
         
         create_test_commit "Historical commit $i" "history$i.txt" "History content $i" "$timestamp"
     done
