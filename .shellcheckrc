@@ -1,0 +1,3 @@
+# Exclude SC1091 - Not following: file was not specified as input
+# This is normal for sourced files in test helpers
+exclude=SC1091

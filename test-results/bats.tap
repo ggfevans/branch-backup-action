@@ -1,0 +1,13 @@
+1..12
+ok 1 branch naming: basic branch name generation
+ok 2 branch naming: sanitizes slashes in branch names
+ok 3 branch naming: handles multiple slashes
+ok 4 branch naming: preserves other characters
+ok 5 date generation: uses current date when no override
+ok 6 github outputs: writes correct format
+ok 7 metadata calculation: statistics gathering
+ok 8 metadata calculation: handles edge case with no commits
+ok 9 tag message: generates correct format
+ok 10 summary generation: creates correct markdown structure
+ok 11 summary generation: handles skipped status
+ok 12 branch existence check: command format
