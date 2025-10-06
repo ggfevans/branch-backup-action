@@ -8,14 +8,17 @@ create_test_repo() {
     local repo_dir="${1:-$BATS_TEST_TMPDIR/test-repo}"
     local initial_branch="${2:-main}"
     
+    # Ensure clean directory creation
+    rm -rf "$repo_dir"
     mkdir -p "$repo_dir"
     cd "$repo_dir"
     
     # Initialize repo with consistent config
-    git init --initial-branch="$initial_branch"
+    git init --initial-branch="$initial_branch" --quiet >/dev/null 2>&1
     configure_test_git_user
     
-    echo "$repo_dir"
+    # Verify we're in the right place and return the path
+    echo "$(pwd)"
 }
 
 # Configure git user for testing (isolated from global config)

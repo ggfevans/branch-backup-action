@@ -42,7 +42,7 @@ assert_summary_contains() {
     
     assert [ -f "$GITHUB_STEP_SUMMARY" ]
     
-    if grep -q "$expected_text" "$GITHUB_STEP_SUMMARY"; then
+    if grep -F "$expected_text" "$GITHUB_STEP_SUMMARY"; then
         return 0
     else
         echo "Expected summary text '$expected_text' not found"

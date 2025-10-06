@@ -1,21 +1,54 @@
-1..20
-ok 1 inputs: defaults applied when not provided in 88ms
-ok 2 inputs: accepts valid backup prefix in 91ms
-ok 3 inputs: accepts alphanumeric, dash, and underscore in backup prefix in 89ms
-ok 4 inputs: trims whitespace from inputs in 95ms
-ok 5 inputs: rejects empty backup prefix after trimming in 114ms
-ok 6 inputs: rejects backup prefix with spaces in 113ms
-ok 7 inputs: rejects backup prefix with special characters in 108ms
-ok 8 inputs: rejects path traversal in backup prefix in 108ms
-ok 9 inputs: rejects empty branch name in 109ms
-ok 10 inputs: rejects empty branch name after trimming in 107ms
-ok 11 inputs: handles missing github token gracefully in 84ms
-ok 12 inputs: uses fallback GITHUB_TOKEN when INPUT_GITHUB_TOKEN not set in 86ms
-ok 13 inputs: INPUT_GITHUB_TOKEN takes precedence over GITHUB_TOKEN in 85ms
-ok 14 inputs: does not leak github token in output or error messages in 92ms
-ok 15 date: uses current date when BBA_DATE_OVERRIDE not set in 92ms
-ok 16 date: respects BBA_DATE_OVERRIDE for testing in 91ms
-ok 17 date: BBA_DATE_OVERRIDE overrides system date in -1759701901312ms
-ok 18 inputs: exports variables for use by other functions in 89ms
-ok 19 inputs: validates extremely long prefix in 85ms
-ok 20 inputs: handles unicode characters in prefix in 108ms
+1..12
+ok 1 branch naming: basic branch name generation in 70ms
+ok 2 branch naming: sanitizes slashes in branch names in 68ms
+ok 3 branch naming: handles multiple slashes in 69ms
+ok 4 branch naming: preserves other characters in 67ms
+ok 5 date generation: uses current date when no override in 68ms
+ok 6 github outputs: writes correct format in 95ms
+not ok 7 metadata calculation: statistics gathering in 30837ms
+# (from function `create_test_commit' in file test/helpers/git.bash, line 44,
+#  in test file test/unit/shell_logic.bats, line 109)
+#   `create_test_commit "Commit 1" "file1.txt" "content 1"' failed with status 128
+# error: 1Password: agent returned an error
+#
+# fatal: failed to write commit object
+not ok 8 metadata calculation: handles edge case with no commits in 186ms
+# (in test file test/unit/shell_logic.bats, line 130)
+#   `COMMITS_THIS_WEEK=$(git log --since='7 days ago' --oneline | wc -l)' failed with status 128
+# fatal: your current branch 'main' does not have any commits yet
+ok 9 tag message: generates correct format in 60ms
+not ok 10 summary generation: creates correct markdown structure in 105ms
+# (from function `assert_summary_contains' in file test/helpers/asserts.bash, line 51,
+#  in test file test/unit/shell_logic.bats, line 204)
+#   `assert_summary_contains "- Date: \`2024-01-02\`"' failed
+# ## Weekly Backup Report
+# ### ✅ Backup Created Successfully
+# **Details:**
+# grep: invalid option --
+# usage: grep [-abcdDEFGHhIiJLlMmnOopqRSsUVvwXxZz] [-A num] [-B num] [-C[num]]
+# 	[-e pattern] [-f file] [--binary-files=value] [--color=when]
+# 	[--context[=num]] [--directories=action] [--label] [--line-buffered]
+# 	[--null] [pattern] [file ...]
+# Expected summary text '- Date: `2024-01-02`' not found
+# Actual summary:
+# ## Weekly Backup Report
+#
+# ### ✅ Backup Created Successfully
+#
+# **Details:**
+# - Date: `2024-01-02`
+# - Branch: `main-backup-2024-01-02`
+# - Commit: `abc123def456`
+# - Source: `main`
+#
+# [View Backup Branch](https://github.com/testorg/testrepo/tree/main-backup-2024-01-02)
+ok 11 summary generation: handles skipped status in 67ms
+not ok 12 branch existence check: command format in 30881ms
+# (from function `create_test_commit' in file test/helpers/git.bash, line 44,
+#  in test file test/unit/shell_logic.bats, line 238)
+#   `create_test_commit "Initial commit"' failed with status 128
+# Initialized empty Git repository in /private/var/folders/qf/44y7vv_n0n39gk78zcyk7v6r0000gn/T/bats-run-AJsqS3/test/12/check-remote.git/
+# /var/folders/qf/44y7vv_n0n39gk78zcyk7v6r0000gn/T/bats-run-AJsqS3/test/12/check-remote.git
+# error: 1Password: agent returned an error
+#
+# fatal: failed to write commit object
