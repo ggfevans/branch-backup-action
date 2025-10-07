@@ -1,3 +1,11 @@
+> **⚠️ Git Already Does This**
+> 
+> Built this before learning [how Git actually works](https://github.blog/open-source/git/how-to-undo-almost-anything-with-git/). It works great! Just... unnecessary.
+> 
+> Preserved as a GitHub Actions reference. Learn from my hubris. 🙃
+
+---
+
 # Branch Backup Action
 
 [![License](https://img.shields.io/github/license/ggfevans/branch-backup-action)](https://github.com/ggfevans/branch-backup-action/blob/main/LICENSE)
